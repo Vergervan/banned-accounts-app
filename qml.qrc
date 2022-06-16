@@ -1,0 +1,8 @@
+<RCC>
+    <qresource prefix="/">
+        <file>main.qml</file>
+        <file>Workspace.qml</file>
+        <file>MessageBox.qml</file>
+        <file>MessageBoxButton.qml</file>
+    </qresource>
+</RCC>
