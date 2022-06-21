@@ -1,0 +1,7 @@
+*
+!test.pro
+!headers/
+!src/
+!*.h
+!*.cpp
+!.gitignore
