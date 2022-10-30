@@ -19,5 +19,5 @@ void TcpHandler::read()
         }
         total_data.append(data_buffer);
     }
-	emit finishedRead(QString(total_data));
+    emit finishedRead(_socket->socketDescriptor(), QString(total_data));
 }

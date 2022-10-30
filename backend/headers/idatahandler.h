@@ -8,7 +8,7 @@ class IDataHandler : protected QObject
 {
     Q_OBJECT;
     public slots: 
-        virtual void handleData(QString data) = 0;
+        virtual void handleData(qintptr socketDscr, QString data) = 0;
 };
 
 #endif

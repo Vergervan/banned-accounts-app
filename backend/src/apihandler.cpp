@@ -1,7 +1,7 @@
 #include "../headers/apihandler.h"
 #include <QDebug>
 
-void ApiHandler::handleData(QString msg)
+void ApiHandler::handleData(qintptr socketDscr, QString msg)
 {
     qDebug() << msg;
 }

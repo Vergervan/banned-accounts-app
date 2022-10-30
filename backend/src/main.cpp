@@ -2,8 +2,10 @@
 #include <map>
 #include <fstream>
 #include <QObject>
+#include <QSqlDatabase>
+#include <QtSql>
 #include <qcoreapplication.h>
-#include "../headers/apihandler.h"
+#include "../headers/appnetworkhandler.h"
 #include "../headers/tcplistener.h"
 #include "../headers/config.h"
 
@@ -25,7 +27,7 @@ int main(int argc, char** argv)
 	TcpListener* listener = new TcpListener;
 	QObject::connect(listener, &TcpListener::acceptError, [=](const QAbstractSocket::SocketError& err){ std::cout << "Accept error: " << err << std::endl;});
 
-	ApiHandler* handler = new ApiHandler;
+    AppNetworkHandler* handler = new AppNetworkHandler;
 	listener->setDataHandler(handler);
 	listener->listen(cfg.address, cfg.port);
 

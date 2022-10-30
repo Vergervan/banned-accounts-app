@@ -9,9 +9,9 @@ TcpListener::TcpListener()
 	// this->setSocketDescriptor(dscr);
 }
 
-void TcpListener::messageProc(QString msg)
+void TcpListener::messageProc(qintptr socketDscr, QString msg)
 {
-	this->_handler->handleData(msg);
+    this->_handler->handleData(socketDscr, msg);
 }
 
 void TcpListener::incomingConnection(qintptr socketDscrpt)

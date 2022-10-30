@@ -14,7 +14,7 @@ class TcpHandler : public QObject
 	public slots:
 		void read();
 	signals:
-		void finishedRead(QString msg);
+        void finishedRead(qintptr socketDscr, QString msg);
 	private:
 		inline ~TcpHandler() { delete _socket; _socket = nullptr; }
 		QTcpSocket* _socket = nullptr;

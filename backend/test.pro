@@ -7,12 +7,14 @@ RCC_DIR     = build/
 
 HEADERS += \
 			headers/apihandler.h \
+			headers/appnetworkhandler.h \
 			headers/idatahandler.h \
 			headers/tcphandler.h \
 			headers/tcplistener.h
 
 
 SOURCES += \
+			src/appnetworkhandler.cpp \
 			src/main.cpp \
 			src/apihandler.cpp \
 			src/tcphandler.cpp \

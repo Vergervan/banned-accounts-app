@@ -18,7 +18,7 @@ class TcpListener : public QTcpServer
 	protected:
 		void incomingConnection(qintptr socket) Q_DECL_OVERRIDE;
 	public slots:
-		void messageProc (QString msg);
+        void messageProc (qintptr socketDscr, QString msg);
 	private:
 		IDataHandler* _handler = nullptr;
 };
