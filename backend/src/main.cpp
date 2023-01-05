@@ -20,7 +20,17 @@ void initDb(QSqlDatabase& db)
     //db.exec("PRAGMA locking_mode = EXCLUSIVE");
     QSqlQuery query(db);
     query.exec("CREATE TABLE IF NOT EXISTS users(username TEXT PRIMARY KEY, pass_hash TEXT NOT NULL, time_stamp TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP)");
-    query.exec("CREATE TABLE IF NOT EXISTS accounts(nick TEXT, login TEXT, unban_time TEXT, owner_user TEXT, time_stamp TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP, FOREIGN KEY(owner_user) REFERENCES users(username))");
+    query.exec("CREATE TABLE IF NOT EXISTS accounts(nick TEXT NOT NULL, login TEXT NOT NULL, unban_time TEXT, owner_user TEXT, time_stamp TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP, PRIMARY KEY(nick, login), FOREIGN KEY(owner_user) REFERENCES users(username))");
+//    query.exec("CREATE TRIGGER IF NOT EXISTS update_account_time BEFORE UPDATE ON accounts \
+//               BEGIN \
+//                  UPDATE accounts SET new.unban_time = datetime(new.unban_time, 'localtime'), time_stamp = datetime('now', 'localtime') \
+//                  WHERE rowid = new.rowid; \
+//               END");
+    query.exec("CREATE TRIGGER IF NOT EXISTS insert_account_time AFTER INSERT ON accounts \
+               BEGIN \
+                  UPDATE accounts SET unban_time = datetime(new.unban_time, 'localtime'), time_stamp = datetime('now', 'localtime') \
+                  WHERE rowid = new.rowid; \
+               END");
 }
 
 int main(int argc, char** argv)
@@ -52,6 +62,7 @@ int main(int argc, char** argv)
 
 	QObject::connect(listener, &TcpListener::acceptError, [=](const QAbstractSocket::SocketError& err){ std::cout << "Accept error: " << err << std::endl;});
     QObject::connect(handler, &IDataHandler::sendPong, listener, &TcpListener::pongHandle);
+    QObject::connect(handler, &AppNetworkHandler::sendRemoveClient, listener, &TcpListener::removeClient);
 
 	listener->setDataHandler(handler);
 	listener->listen(cfg.address, cfg.port);

@@ -47,6 +47,14 @@ void TcpListener::pongHandle(QTcpSocket* socket){
     }
 }
 
+void TcpListener::removeClient(qintptr dscr){
+    QTcpSocket* socket = _currentConnections[dscr];
+    if(_pongerSet.contains(socket))
+        _pongerSet.remove(socket);
+    std::cout << "Socket " << dscr << " disconnected" << std::endl;
+    _currentConnections.remove(dscr);
+}
+
 void TcpListener::messageProc(QTcpSocket* socket, IDataHandler::Message msg)
 {
     //std::cout << socketDscr << " " << msg.toStdString() << std::endl;

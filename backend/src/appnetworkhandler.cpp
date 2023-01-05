@@ -40,6 +40,9 @@ void AppNetworkHandler::handleData(QTcpSocket* socket, IDataHandler::Message msg
               std::cout << obj["nick"].toString().toStdString() << " account data updated" << std::endl;
           }
           break;
+       case Disconnect:
+          emit sendRemoveClient(socket->socketDescriptor());
+          break;
        case Pong:
           emit sendPong(socket);
        break;
@@ -116,18 +119,24 @@ bool AppNetworkHandler::updateAccount(const QJsonObject& obj)
     query.addBindValue(obj["login"].toString());
     query.addBindValue(obj["username"].toString());
     if(!query.exec() || !query.first()){
+        std::cout << "Select user: " << query.lastError().text().toStdString() << std::endl;
         return false;
     }
     QVariant rowid = query.value(0);
+    std::cout << "Rowid: " << rowid.toString().toStdString() << std::endl;
     QString rawValue = obj["days"].toString();
-    QString tempStr = QString("datetime('now', '+%1 day', '+%2 hour', '+%3 minute'").arg(rawValue.mid(0, 2), rawValue.mid(3, 2), rawValue.mid(6, 2));
+    QString tempStr = QString("datetime('now', 'localtime', '+%1 day', '+%2 hour', '+%3 minute'), ").arg(rawValue.mid(0, 2), rawValue.mid(3, 2), rawValue.mid(6, 2));
     query.clear();
-    query.prepare(QString("UPDATE accounts SET unban_time = %1 time_stamp = CURRENT_TIMESTAMP WHERE ROWID = ?").arg(tempStr));
-    query.addBindValue(rowid);
-    return query.exec();
+    query.prepare(QString("UPDATE accounts SET unban_time = %1 time_stamp = datetime('now', 'localtime') WHERE nick = ? AND login = ?").arg(tempStr));
+    query.addBindValue(obj["nick"].toString());
+    query.addBindValue(obj["login"].toString());
+    bool res = query.exec();
+    if(!res)
+        std::cout << "Update user: " << query.lastError().text().toStdString() << std::endl;
+    return res;
 }
 
-
+//select ROWID, nick, julianday(unban_time) - julianday('now') as days_left from accounts where ROWID = 3
 //select *, (date(time_stamp, '+' || substr(unban_time, 1, 2) || ' day')) as unban_date, time(time_stamp, '+' || substr(unban_time, 4, 2) || ' hour') as time from accounts
 
 
