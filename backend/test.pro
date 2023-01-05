@@ -7,14 +7,22 @@ RCC_DIR     = build/
 
 HEADERS += \
 			headers/apihandler.h \
+			headers/appnetworkhandler.h \
+			headers/idatacryptor.h \
 			headers/idatahandler.h \
+			headers/imessagequeue.h \
+			headers/qsimplecrypt.h \
+			headers/simplecryptor.h \
 			headers/tcphandler.h \
 			headers/tcplistener.h
 
 
 SOURCES += \
+			src/appnetworkhandler.cpp \
 			src/main.cpp \
 			src/apihandler.cpp \
+			src/qsimplecrypt.cpp \
+			src/simplecryptor.cpp \
 			src/tcphandler.cpp \
 			src/tcplistener.cpp
 

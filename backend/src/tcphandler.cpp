@@ -1,16 +1,21 @@
 #include "../headers/tcphandler.h"
+#include "../headers/idatahandler.h"
+#include "../headers/appnetworkhandler.h"
 
-TcpHandler::TcpHandler(qintptr dscr)
+TcpHandler::TcpHandler(QTcpSocket* socket)
 {
-	_socket = new QTcpSocket;	
-	_socket->setSocketDescriptor(dscr);
+    _socket = socket;
 	connect(_socket, SIGNAL(readyRead()), this, SLOT(read()));
 }
 
 void TcpHandler::read()
 {
-	std::cout << "Read " << _socket->socketDescriptor() << std::endl;
 	QByteArray total_data, data_buffer;
+    IDataHandler::Message msg;
+    QDataStream stream(this->_socket);
+    ushort code;
+    stream >> code;
+    msg.code = static_cast<AppNetworkHandler::MessageCode>(code);
     while(true)
     {
         data_buffer = _socket->read(1024);
@@ -19,5 +24,6 @@ void TcpHandler::read()
         }
         total_data.append(data_buffer);
     }
-	emit finishedRead(QString(total_data));
+    msg.data = QString(total_data);
+    emit finishedRead(_socket, msg);
 }

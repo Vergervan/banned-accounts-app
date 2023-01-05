@@ -4,5 +4,7 @@
         <file>Workspace.qml</file>
         <file>MessageBox.qml</file>
         <file>MessageBoxButton.qml</file>
+        <file>AccountElement.qml</file>
+        <file>AccountListModel.qml</file>
     </qresource>
 </RCC>

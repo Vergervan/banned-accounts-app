@@ -5,7 +5,7 @@
 
 class ApiHandler : public IDataHandler
 {
-        void handleData(QString msg) override;
+        void handleData(qintptr socketDscr, Message msg);
 };
 
 #endif
