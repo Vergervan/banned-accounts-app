@@ -1,25 +1,30 @@
 import QtQuick 2.15
 import QtQuick.Controls 2.12
-import QtQuick.Dialogs 1.2
+import QtQuick.Dialogs
 
 Window {
     id: root
     signal qmlAuth(string nick, string pass, bool reg)
-    function getAuthResult(res)
+    signal qmlSend(int code, string mes)
+    function getAuthResult(res, err)
     {
-        console.log("Auth result: " + res)
+        console.log("Auth result: " + res + " " + err)
         if(res === true){
             let workcomp = Qt.createComponent("Workspace.qml")
             if(workcomp.status === Component.Ready){
                 console.log("Workspace created")
                 let window = workcomp.createObject(root)
+                window.username = nameEdit.text
                 window.show()
                 root.hide()
             }
         }else if(res === false){
             let msgBoxComp = Qt.createComponent("MessageBox.qml");
-            console.log(msgBoxComp.errorString())
-            let msgBox = msgBoxComp.createObject(root)
+            if(msgBoxComp.status === Component.Ready){
+                console.log(err)
+                let msgBox = msgBoxComp.createObject(root)
+                msgBox.setMessageText(err)
+            }
         }
     }
 
@@ -31,7 +36,7 @@ Window {
     Grid{
         id: loginGrid
         anchors.centerIn: parent
-        rows: 4
+        rows: 5
         rowSpacing: 8
         Row{
             Rectangle{
@@ -80,7 +85,9 @@ Window {
                 id: signinButton
                 width: 100
                 text: "Sign In"
-                onClicked: qmlAuth(nameEdit.text, passwordEdit.text, false)
+                onClicked: {
+                    qmlAuth(nameEdit.text, passwordEdit.text, false)
+                }
             }
         }
         Row{
@@ -89,7 +96,18 @@ Window {
                 id: signupButton
                 width: 100
                 text: "Sign Up"
-                onClicked: qmlAuth(nameEdit.text, passwordEdit.text, true)
+                onClicked: {
+                    qmlAuth(nameEdit.text, passwordEdit.text, true)
+                }
+            }
+        }
+        Row{
+
+            Button{
+                id: debugButton
+                width: 100
+                text: "Debug"
+                onClicked: getAuthResult(true, "")
             }
         }
     }

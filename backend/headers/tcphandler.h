@@ -9,17 +9,16 @@
 
 class TcpHandler : public QObject
 {
-	Q_OBJECT;
+    Q_OBJECT
 
 	public slots:
 		void read();
 	signals:
-        void finishedRead(qintptr socketDscr, QString msg);
-	private:
-		inline ~TcpHandler() { delete _socket; _socket = nullptr; }
+        void finishedRead(QTcpSocket* socket, IDataHandler::Message msg);
+    private:
 		QTcpSocket* _socket = nullptr;
 	public:
-		TcpHandler(qintptr socket);
+        TcpHandler(QTcpSocket* socket);
 		inline QTcpSocket& socket() { return *_socket; }
 };
 #endif

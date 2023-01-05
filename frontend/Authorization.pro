@@ -1,5 +1,7 @@
 QT += quick \
-      sql
+      sql \
+      quickcontrols2 \
+      core
 
 CONFIG += \
             c++11 \
@@ -11,7 +13,9 @@ CONFIG += \
 
 SOURCES += \
         authorizationmanager.cpp \
-        main.cpp
+        main.cpp \
+        qsimplecrypt.cpp \
+        simplecryptor.cpp
 
 RESOURCES += qml.qrc
 
@@ -27,6 +31,10 @@ else: unix:!android: target.path = /opt/$${TARGET}/bin
 !isEmpty(target.path): INSTALLS += target
 
 HEADERS += \
-    authorizationmanager.h
+    authorizationmanager.h \
+    qsimplecrypt.h \
+    simplecryptor.h \
+    idatacryptor.h
+
 
 DISTFILES +=

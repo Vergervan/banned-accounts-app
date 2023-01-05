@@ -4,10 +4,11 @@ import QtQuick.Controls 2.12
 Window {
     id: root
     flags: Qt.Dialog
-    width: mainGrid.width+10
-    height: mainGrid.height+10
+    width: mainGrid.width+60
+    height: mainGrid.height+30
 
     property Component btnComp: Qt.createComponent("MessageBoxButton.qml")
+    property string messageText: ""
 
     function messageBoxButtonClicked(btn){
         console.log("Button clicked " + btn)
@@ -22,6 +23,11 @@ Window {
         btn.msgBoxClick.connect(messageBoxButtonClicked)
     }
 
+    function setMessageText(text){
+        root.messageText = text;
+        messageTextLabel.text = root.messageText
+    }
+
     enum MessageBoxButton{
         Ok = 1,
         Cancel = 2
@@ -31,7 +37,6 @@ Window {
     property int buttonsCount: 0
 
     Component.onCompleted: {
-        messageText.text = "Error"
         let btnComp = Qt.createComponent("MessageBoxButton.qml")
         if((buttons & MessageBox.MessageBoxButton.Ok) === MessageBox.MessageBoxButton.Ok)
         {
@@ -51,10 +56,9 @@ Window {
         rows: 2
         rowSpacing: 10
         anchors.centerIn: parent
-
         Row{
             Text {
-                id: messageText
+                id: messageTextLabel
                 horizontalAlignment: Text.AlignHCenter
             }
         }
@@ -63,6 +67,7 @@ Window {
                 id: buttonGrid
                 columns: buttonsCount
                 columnSpacing: 10
+                anchors.horizontalCenter: parent
             }
         }
     }
