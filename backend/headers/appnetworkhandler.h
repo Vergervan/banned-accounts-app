@@ -25,6 +25,7 @@ public:
 private:
         IDataHandler::Message signHandle(MessageCode, QString, QString);
         bool addAccount(const QJsonObject& obj);
+        bool updateAccount(const QJsonObject& obj);
         QSqlDatabase* _dbptr;
         SimpleCryptor* _cryptor;
 };
