@@ -25,7 +25,7 @@ void AppNetworkHandler::handleData(QTcpSocket* socket, IDataHandler::Message msg
        case SignIn:
           resultMsg = signHandle(msg.code, obj["username"].toString(), obj["pass"].toString());
           stream << getRawCode(resultMsg.code);
-          if(!resultMsg.code != AcceptSignIn)
+          if(resultMsg.code != AcceptSignIn)
                 socket->write(resultMsg.data.toStdString().c_str());
           if(msg.code == SignUp) break;
           if(sendAccountsData(obj, resultMsg.data)){
@@ -54,6 +54,7 @@ void AppNetworkHandler::handleData(QTcpSocket* socket, IDataHandler::Message msg
        case Pong:
           emit sendPong(socket);
        break;
+       default: break;
     }
 }
 
