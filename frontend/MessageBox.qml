@@ -67,7 +67,6 @@ Window {
                 id: buttonGrid
                 columns: buttonsCount
                 columnSpacing: 10
-                anchors.horizontalCenter: parent
             }
         }
     }

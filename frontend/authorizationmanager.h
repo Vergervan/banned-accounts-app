@@ -54,6 +54,7 @@ signals:
     void sendAuthResult(QVariant res, QVariant err);
     void finishedRead(AuthorizationManager::Message msg);
     void sendAccountData(QVariant nick, QVariant login, QVariant time);
+    void sendUserExit();
 private:
     void parseAccounts(const QString& obj);
     QTcpSocket* _socket = nullptr;

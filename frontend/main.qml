@@ -16,6 +16,15 @@ Window {
         window.addAccount(nick,login,time)
     }
 
+    function userExit()
+    {
+        if(window.visible){
+            window.hide()
+            show()
+            window.accModel.clear()
+        }
+    }
+
     function getAuthResult(res, err)
     {
         console.log("Auth result: " + res + " " + err)

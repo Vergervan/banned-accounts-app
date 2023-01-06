@@ -7,6 +7,7 @@ void AuthorizationManager::auth(QString nick, QString pass, bool reg)
     crypto.addData(pass.toUtf8());
     if(_socket != nullptr)
     {
+        _socket->connectToHost("127.0.0.1", 25000);
         sendMessage(reg ? 6 : 3, QString("{\"username\":\"%1\",\"pass\":\"%2\"}").arg(nick, QString(crypto.result())));
         return;
     }
@@ -18,11 +19,18 @@ void AuthorizationManager::auth(QString nick, QString pass, bool reg)
 //    });
     connect(this, SIGNAL(finishedRead(AuthorizationManager::Message)), this, SLOT(handleData(AuthorizationManager::Message)));
     connect(_socket, SIGNAL(readyRead()), this, SLOT(read()));
-    connect(_socket, &QTcpSocket::errorOccurred, this, [this](QAbstractSocket::SocketError){ emit sendAuthResult(false, _socket->errorString()); delete _socket; _socket = nullptr; });
-
+    connect(_socket, &QTcpSocket::errorOccurred, this, [this](QAbstractSocket::SocketError err){
+        emit sendAuthResult(false, _socket->errorString());
+        if(err == QAbstractSocket::RemoteHostClosedError){
+            emit sendUserExit();
+        }
+    });
+    //connect(_socket, &QTcpSocket::connected, [=, &crypto]() { sendMessage(reg ? 6 : 3, QString("{\"username\":\"%1\",\"pass\":\"%2\"}").arg(nick, QString(crypto.result()))); });
     _socket->connectToHost("127.0.0.1", 25000);
+    _socket->waitForConnected(1000);
     _stream = new QDataStream(_socket);
-    sendMessage(reg ? 6 : 3, QString("{\"username\":\"%1\",\"pass\":\"%2\"}").arg(nick, QString(crypto.result())));
+    if(_socket->state() == QAbstractSocket::ConnectedState)
+        sendMessage(reg ? 6 : 3, QString("{\"username\":\"%1\",\"pass\":\"%2\"}").arg(nick, QString(crypto.result())));
 }
 
 void AuthorizationManager::sendMessage(int code, QString mes)
