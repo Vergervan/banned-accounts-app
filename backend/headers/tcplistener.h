@@ -7,6 +7,7 @@
 #include <QSet>
 #include <QMap>
 #include <QTimer>
+#include <QDataStream>
 #include <iostream>
 #include "tcphandler.h"
 #include "idatahandler.h"

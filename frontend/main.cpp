@@ -13,6 +13,12 @@ struct AccountInfo : public QObject{
     signals:
         void usernameChanged();
     public:
+        explicit AccountInfo(QObject *parent = 0):
+                QObject(parent)
+            {}
+
+            AccountInfo(const AccountInfo &) {}
+            AccountInfo& operator=(const AccountInfo &){}
         QString m_username;
 };
 Q_DECLARE_METATYPE(AccountInfo)

@@ -82,6 +82,7 @@ void AuthorizationManager::handleData(AuthorizationManager::Message msg)
         case MonoPing:
             sendMessage(11);
         break;
+        default: break;
     }
 }
 

@@ -1,13 +1,23 @@
 #ifndef AUTHORIZATIONMANAGER_H
 #define AUTHORIZATIONMANAGER_H
 
-#include <QtQmlCore/QtQmlCore>
+
+#ifdef Q_OS_LINUX
+        #include <QtQml/QtQml>
+#endif
+#ifdef Q_OS_WINDOWS
+        #include <QtQmlCore/QtQmlCore>
+#endif
 #include <QCryptographicHash>
 #include <QTcpSocket>
 #include <QThread>
 #include "simplecryptor.h"
 #include <QQueue>
 #include <QDebug>
+#include <QDataStream>
+#include <QJsonDocument>
+#include <QJsonObject>
+#include <QJsonArray>
 
 class AuthorizationManager : public QObject
 {

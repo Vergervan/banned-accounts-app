@@ -1,6 +1,7 @@
 import QtQuick 2.15
 import QtQuick.Controls 2.12
-import QtQuick.Dialogs
+import QtQuick.Dialogs 1.2
+import QtQuick.Window 2.12
 
 Window {
     id: root
