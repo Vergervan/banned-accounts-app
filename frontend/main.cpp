@@ -2,6 +2,7 @@
 #include <QQmlApplicationEngine>
 #include <QQmlContext>
 #include <QQuickWindow>
+#include <QMetaType>
 #include <QDebug>
 #include <QObject>
 #include "authorizationmanager.h"

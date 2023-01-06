@@ -36,6 +36,7 @@ void initDb(QSqlDatabase& db)
 int main(int argc, char** argv)
 {
 	QCoreApplication app(argc, argv);
+    qRegisterMetaType<IDataHandler::Message>("IDataHandler::Message");
     QSqlDatabase db;
     initDb(db);
 

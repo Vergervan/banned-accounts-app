@@ -47,4 +47,7 @@ class IDataHandler : public QObject
             void sendRemoveClient(qintptr);
 };
 
+Q_DECLARE_METATYPE(IDataHandler::Message)
+Q_DECLARE_METATYPE(IDataHandler::MessageCode)
+
 #endif
