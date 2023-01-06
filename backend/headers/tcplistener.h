@@ -40,6 +40,7 @@ class TcpListener : public QTcpServer//, public IMessageQueue
 	public slots:
         void messageProc(QTcpSocket* socket, IDataHandler::Message msg);
         void pongHandle(QTcpSocket* socket);
+        void removeClient(qintptr dscr);
 	private:
 		IDataHandler* _handler = nullptr;
         QSet<QTcpSocket> _socketSet;

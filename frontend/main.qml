@@ -6,18 +6,23 @@ Window {
     id: root
     signal qmlAuth(string nick, string pass, bool reg)
     signal qmlSend(int code, string mes)
+    property Workspace window: Workspace{}
+
+    Component.onCompleted: {
+        window.hide()
+    }
+
+    function addAccount(nick, login, time){
+        window.addAccount(nick,login,time)
+    }
+
     function getAuthResult(res, err)
     {
         console.log("Auth result: " + res + " " + err)
         if(res === true){
-            let workcomp = Qt.createComponent("Workspace.qml")
-            if(workcomp.status === Component.Ready){
-                console.log("Workspace created")
-                let window = workcomp.createObject(root)
-                window.username = nameEdit.text
-                window.show()
-                root.hide()
-            }
+            window.username = nameEdit.text
+            window.show()
+            root.hide()
         }else if(res === false){
             let msgBoxComp = Qt.createComponent("MessageBox.qml");
             if(msgBoxComp.status === Component.Ready){

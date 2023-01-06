@@ -61,6 +61,7 @@ void AuthorizationManager::handleData(AuthorizationManager::Message msg)
     switch(msg.code)
     {
         case AcceptSignIn:
+            parseAccounts(msg.data);
         case AcceptSignUp:
             emit sendAuthResult(true, "");
         break;
@@ -68,15 +69,6 @@ void AuthorizationManager::handleData(AuthorizationManager::Message msg)
         case ErrorSignUp:
             _currentUser.clear();
             emit sendAuthResult(false, msg.data);
-        break;
-        case AddAccount:
-
-        break;
-        case ErrorAccount:
-
-        break;
-        case UserAccountsData:
-
         break;
         case Ping:
         case MonoPing:
@@ -86,11 +78,36 @@ void AuthorizationManager::handleData(AuthorizationManager::Message msg)
 }
 
 void AuthorizationManager::sendDisconnect(){
-    qDebug() << "Send disconnect";
     if(_socket != nullptr){
+        QDataStream stream(_socket);
+        stream << (static_cast<ushort>(Disconnect));
+        qDebug() << "Send disconnect";
         _socket->disconnectFromHost();
         _socket->abort();
         _socket->close();
+    }
+}
+
+void AuthorizationManager::parseAccounts(const QString& data)
+{
+    QJsonDocument doc = QJsonDocument::fromJson(data.toUtf8());
+    auto accArray = doc.object().value("accounts").toArray();
+    foreach (const QJsonValue& val, accArray){
+        auto obj = val.toObject();
+        QString numStr = obj["days_left"].toString();
+        QString time = "00 00:00";
+        double num = numStr.toDouble();
+        if(num > 0){
+            int days = (int)num;
+            num -= days;
+            num *= 24;
+            int hours = (int)num;
+            num -= hours;
+            num *= 60;
+            int minutes = (int)num;
+            time = QString("%1,%2,%3").arg(days).arg(hours).arg(minutes);
+        }
+        emit sendAccountData(obj["nick"].toString(), obj["login"].toString(), time);
     }
 }
 

@@ -11,6 +11,19 @@ Window {
     property string username: ""
     Component.onCompleted: accModel.clear()
 
+    function addAccount(nick, login, time){
+        //accModel.append({"name": nick, "login": login, "days": time})
+        if(time === "00 00:00"){
+            accModel.append({"name": nick, "login": login, "days": time})
+        }
+        else{
+            var numbers = time.split(',');
+            var days = numbers[0]*1, hours = numbers[1]*1, minutes = numbers[2]*1
+            time = (days < 10 ? ("0"+numbers[0]) : numbers[0]) + " " + (hours < 10 ? ("0"+numbers[1]) : numbers[1]) + ":" + (minutes < 10 ? ("0"+numbers[2]) : numbers[2])
+            accModel.append({"name": nick, "login": login, "days": time, "daysNum": days, "hoursNum": hours, "minutesNum": minutes})
+        }
+    }
+
     Grid{
         id: grid
         columns: 2
@@ -75,17 +88,53 @@ Window {
                         clip: true
                         property bool isEdit: false
                         property bool isNew: false
+                        property string tempDays: ""
                         property int currentEdit: 0
+                        //Component.onCompleted: timer.running = true
+                        Timer {
+                            id:timer
+                            interval: 60000; running: window.visible; repeat: true
+                            onTriggered: {
+                                if(minutesNum === 0){
+                                    if(hoursNum === 0){
+                                        if(daysNum === 0) return
+                                        daysNum--
+                                        hoursNum = 23
+                                        minutesNum = 59
+                                    }else{
+                                        hoursNum--
+                                        minutesNum = 59
+                                    }
+                                }else{
+                                    minutesNum--
+                                }
+                                listItem.tempDays = (daysNum < 10 ? ("0"+daysNum) : daysNum.toString()) + " " + (hoursNum < 10 ? ("0"+hoursNum) : hoursNum.toString()) + ":" + (minutesNum < 10 ? ("0"+minutesNum) : minutesNum.toString())
+                                if(!listItem.isEdit){
+                                    days = listItem.tempDays
+                                }
+                                console.log("Temp days: " + listItem.tempDays)
+                            }
+                        }
+
                         function onEdit(){
                             if(isEdit){
                                 if(nickTextEdit.text === "" && loginTextEdit.text === ""){
                                     console.log(listview.currentIndex + ": " + name)
                                     accModel.remove(listview.currentIndex)
+                                }else if(daysTextEdit.text === days){
+                                }else if(daysTextEdit.text.search("^[0-9]{2} [0-9]{2}:[0-9]{2}$") !== 0){
+                                    daysTextEdit.text = "00 00:00"
+                                    daysTextEdit.focus = true
+                                    return
                                 }else{
                                     name = nickTextEdit.text
                                     login = loginTextEdit.text
+                                    var arr = daysTextEdit.text.split(/[: ]+/)
+                                    console.log("Array: " + arr.length + " edit: " + daysTextEdit.text)
+                                    daysNum = arr[0]*1
+                                    hoursNum = arr[1]*1
+                                    minutesNum = arr[2]*1
                                     days = daysTextEdit.text
-                                    currentEdit = 0
                                     var str = "{\"nick\":\"%1\",\"login\":\"%2\",\"days\":\"%3\",\"username\":\"%4\"}"
                                     qmlSend(isNew ? 12 : 14, str.arg(name).arg(login).arg(days).arg(window.username))
                                     if(isNew) isNew = false
@@ -104,6 +153,8 @@ Window {
                             }
                             else if(event.key === Qt.Key_Delete){
                                 accModel.remove(listview.currentIndex)
+                                var str = "{\"nick\":\"%1\",\"login\":\"%2\",\"username\":\"%3\"}"
+                                qmlSend(13, str.arg(nickTextEdit.text).arg(loginTextEdit.text).arg(window.username))
                                 event.accepted = true
                             }
                             else if(isEdit){

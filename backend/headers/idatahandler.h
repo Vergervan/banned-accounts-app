@@ -30,6 +30,7 @@ class IDataHandler : public QObject
             SyncData = 16,
             UserAccountsData = 17,
             ErrorAccount = 18,
+            Disconnect = 19,
             MonoPing = 80
         };
         struct Message{
@@ -43,6 +44,7 @@ class IDataHandler : public QObject
         virtual void handleData(QTcpSocket* socket, IDataHandler::Message msg) = 0;
     signals:
             void sendPong(QTcpSocket* socket);
+            void sendRemoveClient(qintptr);
 };
 
 #endif

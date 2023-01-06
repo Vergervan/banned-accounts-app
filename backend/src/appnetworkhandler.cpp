@@ -21,11 +21,16 @@ void AppNetworkHandler::handleData(QTcpSocket* socket, IDataHandler::Message msg
     Message resultMsg;
     switch(msg.code)
     {
-       case SignIn:
        case SignUp:
+       case SignIn:
           resultMsg = signHandle(msg.code, obj["username"].toString(), obj["pass"].toString());
           stream << getRawCode(resultMsg.code);
-          socket->write(resultMsg.data.toStdString().c_str());
+          if(!resultMsg.code != AcceptSignIn)
+                socket->write(resultMsg.data.toStdString().c_str());
+          if(msg.code == SignUp) break;
+          if(sendAccountsData(obj, resultMsg.data)){
+                socket->write(resultMsg.data.toStdString().c_str());
+          }
           break;
        case AddAccount:
           std::cout << "Trying to add account" << std::endl;
@@ -39,6 +44,9 @@ void AppNetworkHandler::handleData(QTcpSocket* socket, IDataHandler::Message msg
           if(updateAccount(obj)){
               std::cout << obj["nick"].toString().toStdString() << " account data updated" << std::endl;
           }
+          break;
+       case DeleteAccount:
+          deleteAccount(obj);
           break;
        case Disconnect:
           emit sendRemoveClient(socket->socketDescriptor());
@@ -134,6 +142,35 @@ bool AppNetworkHandler::updateAccount(const QJsonObject& obj)
     if(!res)
         std::cout << "Update user: " << query.lastError().text().toStdString() << std::endl;
     return res;
+}
+
+void AppNetworkHandler::deleteAccount(const QJsonObject& obj)
+{
+    QSqlQuery query;
+    query.prepare("DELETE FROM accounts WHERE nick = ? AND login = ? AND owner_user = ?");
+    query.addBindValue(obj["nick"].toString());
+    query.addBindValue(obj["login"].toString());
+    query.addBindValue(obj["username"].toString());
+    query.exec();
+}
+
+bool AppNetworkHandler::sendAccountsData(const QJsonObject& obj, QString& body)
+{
+    QString json2send = "{\"accounts\":[";
+    QSqlQuery query;
+    query.prepare("SELECT nick, login, JULIANDAY(unban_time) - JULIANDAY('now', 'localtime') AS days_left FROM accounts WHERE owner_user = ? ORDER BY days_left");
+    query.addBindValue(obj["username"].toString());
+    if(!query.exec() || !query.first())
+        return false;
+//    query.last();
+//    int count = query.at() + 1;
+    json2send.append( "{\"nick\":\"" % query.value(0).toString() % "\",\"login\":\"" % query.value(1).toString() % "\",\"days_left\":\"" % query.value(2).toString() % "\"}");
+    while(query.next()){
+        json2send.append( ",{\"nick\":\"" % query.value(0).toString() % "\",\"login\":\"" % query.value(1).toString() % "\",\"days_left\":\"" % query.value(2).toString() % "\"}");
+    }
+    json2send.append("]}");
+    body = json2send;
+    return true;
 }
 
 //select ROWID, nick, julianday(unban_time) - julianday('now') as days_left from accounts where ROWID = 3

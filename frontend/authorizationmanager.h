@@ -33,6 +33,7 @@ public:
         SyncData = 16,
         UserAccountsData = 17,
         ErrorAccount = 18,
+        Disconnect = 19,
         MonoPing = 80
     };
     struct Message{
@@ -52,7 +53,9 @@ private slots:
 signals:
     void sendAuthResult(QVariant res, QVariant err);
     void finishedRead(AuthorizationManager::Message msg);
+    void sendAccountData(QVariant nick, QVariant login, QVariant time);
 private:
+    void parseAccounts(const QString& obj);
     QTcpSocket* _socket = nullptr;
     QDataStream* _stream = nullptr;
     QString _currentUser;
