@@ -13,14 +13,17 @@ Configurator::Configurator(){
 void Configurator::rememberUser(QString username, QString passhash)
 {
     QFile cfgFile(_configPath + "/config.cfg");
+    QTextStream stream(&cfgFile);
+    stream.setEncoding(QStringConverter::Utf8);
     cfgFile.open(QFile::WriteOnly);
     QString filestr;
     if(cfgFile.isOpen())
         filestr = QString(cfgFile.readAll());
     if(filestr.isEmpty())
     {
-        cfgFile.write("RememberUser=true\n");
-        cfgFile.write(QString("Username=%1\nPasshash=%2\n").arg(username, passhash).toStdString().c_str());
+        stream << "RememberUser=true\n";
+        stream << QString("Username=%1\nPasshash=%2\n").arg(username, passhash);
+        stream.flush();
         cfgFile.close();
         return;
     }
@@ -40,7 +43,8 @@ void Configurator::rememberUser(QString username, QString passhash)
             newStr += str;
     }
     cfgFile.resize(0);
-    cfgFile.write(newStr.toStdString().c_str());
+    stream << newStr;
+    stream.flush();
     cfgFile.close();
 }
 
@@ -54,19 +58,17 @@ Configurator::ConfigInfo Configurator::getConfigInfo(){
     if(!info.newConfig)
     {
         QList<QString> list = filestr.split('\n');
-        qDebug() << list.length();
         foreach(const auto& str, list)
         {
             if(str.isEmpty()) continue;
             QStringList keyval = str.split('=');
             _dict.insert({ keyval[0], keyval[1] });
         }
-        QString username, pass_hash;
         auto val = _dict.find("RememberUser");
         info.rememberUser = (val != _dict.end()) && (val->second == "true");
         if(info.rememberUser)
         {
-            username = _dict["Username"], pass_hash = _dict["Passhash"];
+            info.username = _dict["Username"], info.passhash = _dict["Passhash"];
         }
     }
     cfgFile.close();
