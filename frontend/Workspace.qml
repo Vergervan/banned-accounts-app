@@ -36,29 +36,59 @@ Window {
         rightPadding: 5
         Column{
             width: grid.width / 3
-            Button{
-                id: control
-                text: "<b>+</b>"
-                background: Rectangle{
-                    implicitWidth: 25
-                    implicitHeight: 25
-                    opacity: enabled ? 1 : 0.3
-                    border.color: control.down ? "#17a81a" : "#21be2b"
-                    border.width: 1
-                    radius: 4
-                }
+            Row{
+                width: parent.width
+                height: plusButton.height
+                Rectangle{
+                    width: parent.width
+                    height: plusButton.height
+                    Button{
+                        id: plusButton
+                        text: "<b>+</b>"
+                        background: Rectangle{
+                            implicitWidth: 25
+                            implicitHeight: 25
+                            opacity: enabled ? 1 : 0.3
+                            border.color: plusButton.down ? "#17a81a" : "#21be2b"
+                            border.width: 1
+                            radius: 4
+                        }
 
-                onClicked: {
-                    if(listview.count > 0){
-                        var item = listview.getCurrentItem()
-                        if(item.isEdit)
-                            item.onEdit()
+                        onClicked: {
+                            if(listview.count > 0){
+                                var item = listview.getCurrentItem()
+                                if(item.isEdit)
+                                    item.onEdit()
+                            }
+                            accModel.append({"name": "", "login": "", "days":"000000"})
+                            listview.currentIndex = listview.count - 1
+                            listview.getCurrentItem().isNew = true
+                            listview.getCurrentItem().onEdit()
+                            listview.focus = true
+                        }
                     }
-                    accModel.append({"name": "", "login": "", "days":"000000"})
-                    listview.currentIndex = listview.count - 1
-                    listview.getCurrentItem().isNew = true
-                    listview.getCurrentItem().onEdit()
-                    listview.focus = true
+                    Button{
+                        id: minusButton
+                        text: "<b>-</b>"
+                        x:27
+                        background: Rectangle{
+                            implicitWidth: 25
+                            implicitHeight: 25
+                            opacity: enabled ? 1 : 0.3
+                            border.color: minusButton.down ? "#a81e17" : "#eb391a"
+                            border.width: 1
+                            radius: 4
+                        }
+
+                        onClicked: {
+                            if(listview.count > 0){
+                                accModel.remove(listview.currentIndex)
+                                var str = "{\"nick\":\"%1\",\"login\":\"%2\",\"username\":\"%3\"}"
+                                if(!listview.getCurrentItem().isNew)
+                                    qmlSend(13, str.arg(nickTextEdit.text).arg(loginTextEdit.text).arg(window.username))
+                            }
+                        }
+                    }
                 }
             }
         }
@@ -121,7 +151,7 @@ Window {
                                 if(nickTextEdit.text === "" && loginTextEdit.text === ""){
                                     console.log(listview.currentIndex + ": " + name)
                                     accModel.remove(listview.currentIndex)
-                                }else if(daysTextEdit.text === days){
+                                }else if(daysTextEdit.text === days && !isNew){
                                 }else if(daysTextEdit.text.search("^[0-9]{2} [0-9]{2}:[0-9]{2}$") !== 0){
                                     daysTextEdit.text = "00 00:00"
                                     daysTextEdit.focus = true

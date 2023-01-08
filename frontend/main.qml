@@ -39,7 +39,7 @@ Window {
     {
         console.log("Auth result: " + res + " " + err)
         if(res === true){
-            window.username = nameEdit.text
+            window.username = err
             window.show()
             root.hide()
             if(rememberCheck)
