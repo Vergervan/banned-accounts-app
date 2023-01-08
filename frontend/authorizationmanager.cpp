@@ -1,17 +1,40 @@
 #include "authorizationmanager.h"
 
+void AuthorizationManager::quickAuth(QString username, QString pass_hash)
+{
+    _currentUser = username;
+    _currentPasshash = pass_hash;
+    initSocketConnection();
+    if(_socket->state() == QAbstractSocket::ConnectedState){
+        sendMessage(3, QString("{\"username\":\"%1\",\"pass\":\"%2\"}").arg(username, pass_hash));
+    }
+}
+
+void AuthorizationManager::saveCurrentUser()
+{
+    emit sendConfigRememberUser(_currentUser, _currentPasshash);
+}
+
 void AuthorizationManager::auth(QString nick, QString pass, bool reg)
 {
     _currentUser = nick;
     QCryptographicHash crypto(QCryptographicHash::Sha256);
     crypto.addData(pass.toUtf8());
+    _currentPasshash = QString(crypto.result());
     if(_socket != nullptr)
     {
-        _socket->connectToHost("127.0.0.1", 25000);
-        sendMessage(reg ? 6 : 3, QString("{\"username\":\"%1\",\"pass\":\"%2\"}").arg(nick, QString(crypto.result())));
+        _socket->connectToHost("193.109.79.66", 25000);
+        sendMessage(reg ? 6 : 3, QString("{\"username\":\"%1\",\"pass\":\"%2\"}").arg(nick, _currentPasshash));
         return;
     }
 
+    initSocketConnection();
+    if(_socket->state() == QAbstractSocket::ConnectedState)
+        sendMessage(reg ? 6 : 3, QString("{\"username\":\"%1\",\"pass\":\"%2\"}").arg(nick, _currentPasshash));
+}
+
+void AuthorizationManager::initSocketConnection()
+{
     _socket = new QTcpSocket;
 //    _thread = new QThread;
 //    connect(_thread, &QThread::started, this, [this]{
@@ -26,11 +49,9 @@ void AuthorizationManager::auth(QString nick, QString pass, bool reg)
         }
     });
     //connect(_socket, &QTcpSocket::connected, [=, &crypto]() { sendMessage(reg ? 6 : 3, QString("{\"username\":\"%1\",\"pass\":\"%2\"}").arg(nick, QString(crypto.result()))); });
-    _socket->connectToHost("127.0.0.1", 25000);
+    _socket->connectToHost("193.109.79.66", 25000);
     _socket->waitForConnected(1000);
     _stream = new QDataStream(_socket);
-    if(_socket->state() == QAbstractSocket::ConnectedState)
-        sendMessage(reg ? 6 : 3, QString("{\"username\":\"%1\",\"pass\":\"%2\"}").arg(nick, QString(crypto.result())));
 }
 
 void AuthorizationManager::sendMessage(int code, QString mes)
@@ -120,11 +141,7 @@ void AuthorizationManager::parseAccounts(const QString& data)
     }
 }
 
-AuthorizationManager::AuthorizationManager()
-{
-    _cryptor = new SimpleCryptor(0x04534FAB057D);
-}
-
+AuthorizationManager::AuthorizationManager(){}
 AuthorizationManager::~AuthorizationManager(){
     if(_socket != nullptr)
     {
@@ -132,5 +149,4 @@ AuthorizationManager::~AuthorizationManager(){
         delete _socket;
         delete _stream;
     }
-    delete _cryptor;
 }

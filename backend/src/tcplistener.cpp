@@ -12,8 +12,8 @@ TcpListener::TcpListener()
 	// setsockopt(dscr, SOL_SOCKET, SO_REUSEPORT, &val, sizeof(val));
     // this->setSocketDescriptor(dscr);
     int val = 1;
-    setsockopt(this->socketDescriptor(), SOL_SOCKET, SO_REUSEADDR, &val, sizeof(int));
-    setsockopt(this->socketDescriptor(), SOL_SOCKET, SO_REUSEPORT, &val, sizeof(int));
+    setsockopt(this->socketDescriptor(), SOL_SOCKET, SO_REUSEADDR, (char*)&val, sizeof(int));
+    //setsockopt(this->socketDescriptor(), SOL_SOCKET, SO_REUSEPORT, &val, sizeof(int));
     _pinger.callOnTimeout([&, this](){
         if(_pongerSet.count() != 0){
             for(auto con = _pongerSet.begin(); con != _pongerSet.end(); con++) {

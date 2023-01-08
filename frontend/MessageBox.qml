@@ -6,7 +6,6 @@ Window {
     flags: Qt.Dialog
     width: mainGrid.width+60
     height: mainGrid.height+30
-
     property Component btnComp: Qt.createComponent("MessageBoxButton.qml")
     property string messageText: ""
 
@@ -26,6 +25,9 @@ Window {
     function setMessageText(text){
         root.messageText = text;
         messageTextLabel.text = root.messageText
+    }
+    function setTitle(titleText){
+        root.title = titleText
     }
 
     enum MessageBoxButton{

@@ -18,6 +18,9 @@
 #ifdef Q_OS_LINUX
 #include <sys/socket.h>
 #endif
+#ifdef Q_OS_WIN
+#include <winsock2.h>
+#endif
 
 class TcpListener : public QTcpServer//, public IMessageQueue
 {

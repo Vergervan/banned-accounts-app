@@ -1,16 +1,25 @@
 import QtQuick 2.15
 import QtQuick.Controls 2.12
-import QtQuick.Dialogs 1.2
-import QtQuick.Window 2.12
+import QtQuick.Dialogs
 
 Window {
     id: root
     signal qmlAuth(string nick, string pass, bool reg)
     signal qmlSend(int code, string mes)
+    signal qmlSaveCurrentUser()
     property Workspace window: Workspace{}
 
     Component.onCompleted: {
         window.hide()
+    }
+
+    function showMessageBox(title, text){
+        let msgBoxComp = Qt.createComponent("MessageBox.qml");
+        if(msgBoxComp.status === Component.Ready){
+            let msgBox = msgBoxComp.createObject(root)
+            msgBox.setMessageText(text)
+            msgBox.setTitle(title)
+        }
     }
 
     function addAccount(nick, login, time){
@@ -33,6 +42,8 @@ Window {
             window.username = nameEdit.text
             window.show()
             root.hide()
+            if(rememberCheck)
+                qmlSaveCurrentUser()
         }else if(res === false){
             let msgBoxComp = Qt.createComponent("MessageBox.qml");
             if(msgBoxComp.status === Component.Ready){
@@ -117,13 +128,17 @@ Window {
             }
         }
         Row{
+              CheckBox{
+                  id: rememberCheck
+                  text: "Remember me"
+              }
 
-            Button{
-                id: debugButton
-                width: 100
-                text: "Debug"
-                onClicked: getAuthResult(true, "")
-            }
+//            Button{
+//                id: debugButton
+//                width: 100
+//                text: "Debug"
+//                onClicked: getAuthResult(true, "")
+//            }
         }
     }
 }

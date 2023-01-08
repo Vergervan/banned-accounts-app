@@ -1,7 +1,8 @@
 QT += quick \
       sql \
       quickcontrols2 \
-      core
+      core \
+      widgets
 
 CONFIG += \
             c++11 \
@@ -11,13 +12,19 @@ CONFIG += \
 # In order to do so, uncomment the following line.
 #DEFINES += QT_DISABLE_DEPRECATED_BEFORE=0x060000    # disables all the APIs deprecated before Qt 6.0.0
 
+HEADERS += \
+    authorizationmanager.h \
+    configurator.h \
+    idatacryptor.h
+
 SOURCES += \
         authorizationmanager.cpp \
-        main.cpp \
-        qsimplecrypt.cpp \
-        simplecryptor.cpp
+        configurator.cpp \
+        main.cpp
 
 RESOURCES += qml.qrc
+
+TARGET = BannedAccounts
 
 # Additional import path used to resolve QML modules in Qt Creator's code model
 QML_IMPORT_PATH =
@@ -29,12 +36,6 @@ QML_DESIGNER_IMPORT_PATH =
 qnx: target.path = /tmp/$${TARGET}/bin
 else: unix:!android: target.path = /opt/$${TARGET}/bin
 !isEmpty(target.path): INSTALLS += target
-
-HEADERS += \
-    authorizationmanager.h \
-    qsimplecrypt.h \
-    simplecryptor.h \
-    idatacryptor.h
 
 
 DISTFILES +=

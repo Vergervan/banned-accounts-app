@@ -14,7 +14,8 @@ HEADERS += \
 			headers/qsimplecrypt.h \
 			headers/simplecryptor.h \
 			headers/tcphandler.h \
-			headers/tcplistener.h
+                        headers/tcplistener.h \
+                        headers/config.h
 
 
 SOURCES += \
@@ -28,3 +29,7 @@ SOURCES += \
 
 
 QT += core network sql
+
+win32{
+    LIBS += -lws2_32
+}
