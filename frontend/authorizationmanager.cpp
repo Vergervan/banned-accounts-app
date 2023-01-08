@@ -1,5 +1,9 @@
 #include "authorizationmanager.h"
 
+#define LOCAL_IP "127.0.0.1"
+#define SERVER_IP "193.109.79.66"
+#define CURRENT_IP SERVER_IP
+
 void AuthorizationManager::quickAuth(QString username, QString pass_hash)
 {
     _currentUser = username;
@@ -24,7 +28,7 @@ void AuthorizationManager::auth(QString nick, QString pass, bool reg)
     if(_socket != nullptr)
     {
         if(!_socket->state() == QAbstractSocket::ConnectedState)
-            _socket->connectToHost("127.0.0.1", 25000);
+            _socket->connectToHost(CURRENT_IP, 25000);
         sendMessage(reg ? 6 : 3, QString("{\"username\":\"%1\",\"pass\":\"%2\"}").arg(nick, _currentPasshash));
         return;
     }
@@ -50,7 +54,7 @@ void AuthorizationManager::initSocketConnection()
         }
     });
     //connect(_socket, &QTcpSocket::connected, [=, &crypto]() { sendMessage(reg ? 6 : 3, QString("{\"username\":\"%1\",\"pass\":\"%2\"}").arg(nick, QString(crypto.result()))); });
-    _socket->connectToHost("127.0.0.1", 25000);
+    _socket->connectToHost(CURRENT_IP, 25000);
     _socket->waitForConnected(1000);
     _stream = new QDataStream(_socket);
 }
