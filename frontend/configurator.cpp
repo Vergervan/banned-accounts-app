@@ -21,12 +21,11 @@ std::wstring Configurator::widen( const std::string& str )
 
 void Configurator::setAutostartApplication(bool val)
 {
-    std::wstring path = widen(QCoreApplication::applicationDirPath().replace("/", "\\").toStdString() + "\\BannedAccounts.exe");
 #ifdef Q_OS_WINDOWS
+    std::wstring path = widen(QCoreApplication::applicationDirPath().replace("/", "\\").toStdString() + "\\BannedAccounts.exe");
     HKEY hkey = NULL;
     RegCreateKey(HKEY_LOCAL_MACHINE, L"Software\\Microsoft\\Windows\\CurrentVersion\\Run", &hkey);
-    LONG status = RegSetValueEx(hkey, L"Banned Accounts", 0, REG_SZ, (BYTE*)path.c_str(), (path.size()+1) * sizeof(wchar_t));
-    qDebug() << status;
+    RegSetValueEx(hkey, L"Banned Accounts", 0, REG_SZ, (BYTE*)path.c_str(), (path.size()+1) * sizeof(wchar_t));
 #endif
     QFile cfgFile(_configPath + "/config.cfg");
     QTextStream stream(&cfgFile);

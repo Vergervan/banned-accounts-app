@@ -42,6 +42,11 @@ int main(int argc, char *argv[])
     QObject::connect(&authManager, &AuthorizationManager::sendConfigRememberUser, &conf, &Configurator::rememberUser);
     auto confInfo = conf.getConfigInfo();
     conf.setAutostartApplication(true);
+
+    QSystemTrayIcon tray;
+    tray.setIcon(QIcon("appicon.ico"));
+    tray.show();
+
     const QUrl url(QStringLiteral("qrc:/main.qml"));
     QObject::connect(&engine, &QQmlApplicationEngine::objectCreated,
                      &app, [url, &authManager, &confInfo](QObject *obj, const QUrl &objUrl) {

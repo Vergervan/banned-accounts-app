@@ -1,6 +1,7 @@
 import QtQuick 2.15
 import QtQuick.Controls 2.12
 import QtQuick.Dialogs
+import Qt.labs.platform
 
 Window {
     id: root
@@ -9,10 +10,24 @@ Window {
     signal qmlSaveCurrentUser()
     property Workspace window: Workspace{}
 
+    SystemTrayIcon {
+        visible: true
+        icon.source: "qrc:/appicon.ico"
+
+        onActivated: {
+            if(window.visible){
+                window.hide()
+            }else{
+                window.show()
+                window.raise()
+                window.requestActivate()
+            }
+        }
+    }
+
     Component.onCompleted: {
         window.hide()
     }
-
     function showMessageBox(title, text){
         let msgBoxComp = Qt.createComponent("MessageBox.qml");
         if(msgBoxComp.status === Component.Ready){
