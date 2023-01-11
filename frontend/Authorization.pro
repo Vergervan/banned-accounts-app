@@ -26,9 +26,14 @@ RESOURCES += qml.qrc
 
 TARGET = BannedAccounts
 
+win32:LIBS += -lAdvapi32
+
 # Additional import path used to resolve QML modules in Qt Creator's code model
 QML_IMPORT_PATH =
 
+RC_ICONS = appicon.ico
+QMAKE_TARGET_DESCRIPTION = Banned Accounts
+QMAKE_TARGET_COMPANY = Vergervan
 # Additional import path used to resolve QML modules just for Qt Quick Designer
 QML_DESIGNER_IMPORT_PATH =
 

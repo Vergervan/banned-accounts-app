@@ -10,6 +10,53 @@ Configurator::Configurator(){
         cfgFile.close();
 }
 
+std::wstring Configurator::widen( const std::string& str )
+{
+    std::wostringstream wstm;
+    const std::ctype<wchar_t>& ctfacet = std::use_facet<std::ctype<wchar_t>>(wstm.getloc()) ;
+    for( size_t i=0 ; i<str.size() ; ++i )
+              wstm << ctfacet.widen( str[i] ) ;
+    return wstm.str();
+}
+
+void Configurator::setAutostartApplication(bool val)
+{
+    std::wstring path = widen(QCoreApplication::applicationDirPath().replace("/", "\\").toStdString() + "\\BannedAccounts.exe");
+#ifdef Q_OS_WINDOWS
+    HKEY hkey = NULL;
+    RegCreateKey(HKEY_LOCAL_MACHINE, L"Software\\Microsoft\\Windows\\CurrentVersion\\Run", &hkey);
+    LONG status = RegSetValueEx(hkey, L"Banned Accounts", 0, REG_SZ, (BYTE*)path.c_str(), (path.size()+1) * sizeof(wchar_t));
+    qDebug() << status;
+#endif
+    QFile cfgFile(_configPath + "/config.cfg");
+    QTextStream stream(&cfgFile);
+    stream.setEncoding(QStringConverter::Utf8);
+    cfgFile.open(QFile::WriteOnly);
+    QString filestr;
+    if(cfgFile.isOpen())
+        filestr = QString(cfgFile.readAll());
+    if(filestr.isEmpty())
+    {
+        stream << QString("RememberUser=%1\n").arg(val ? "true" : "false");
+        stream.flush();
+        cfgFile.close();
+        return;
+    }
+    QString newStr;
+    auto list = filestr.split('\n');
+    foreach(const auto& str, list)
+    {
+        if(str.indexOf("Autostart=") != -1)
+            newStr += QString("RememberUser=%1\n").arg(val ? "true" : "false");
+        else
+            newStr += str;
+    }
+    cfgFile.resize(0);
+    stream << newStr;
+    stream.flush();
+    cfgFile.close();
+}
+
 void Configurator::rememberUser(QString username, QString passhash)
 {
     QFile cfgFile(_configPath + "/config.cfg");
@@ -31,9 +78,7 @@ void Configurator::rememberUser(QString username, QString passhash)
     auto list = filestr.split('\n');
     foreach(const auto& str, list)
     {
-        if(str.isEmpty())
-            newStr += str;
-        else if(str.indexOf("RememberUser=") != -1)
+        if(str.indexOf("RememberUser=") != -1)
             newStr += "RememberUser=true\n";
         else if(str.indexOf("Username=") != -1)
             newStr += QString("Username=%1\n").arg(username);

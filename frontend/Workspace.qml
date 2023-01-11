@@ -82,10 +82,11 @@ Window {
 
                         onClicked: {
                             if(listview.count > 0){
-                                accModel.remove(listview.currentIndex)
                                 var str = "{\"nick\":\"%1\",\"login\":\"%2\",\"username\":\"%3\"}"
-                                if(!listview.getCurrentItem().isNew)
-                                    qmlSend(13, str.arg(nickTextEdit.text).arg(loginTextEdit.text).arg(window.username))
+                                let item = accModel.get(listview.currentIndex)
+                                qmlSend(13, str.arg(item.name).arg(item.login).arg(window.username))
+                                accModel.remove(listview.currentIndex)
+                                listview.focus = true
                             }
                         }
                     }

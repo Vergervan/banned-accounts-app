@@ -2,7 +2,7 @@
 
 #define LOCAL_IP "127.0.0.1"
 #define SERVER_IP "193.109.79.66"
-#define CURRENT_IP LOCAL_IP
+#define CURRENT_IP SERVER_IP
 
 void AuthorizationManager::quickAuth(QString username, QString pass_hash)
 {

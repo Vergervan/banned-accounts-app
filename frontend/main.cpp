@@ -35,28 +35,23 @@ int main(int argc, char *argv[])
 #if QT_VERSION < QT_VERSION_CHECK(6, 0, 0)
     QCoreApplication::setAttribute(Qt::AA_EnableHighDpiScaling);
 #endif
-//#ifdef Q_OS_WINDOWS
-//    HKEY hkey = NULL;
-//    RegCreateKey(HKEY_LOCAL_MACHINE, L"Software\\Microsoft\\Windows\\CurrentVersion\\Run", &hkey);
-//    RegSetValueEx()
-//#endif
-    QGuiApplication* app = new QGuiApplication(argc, argv);
+    QGuiApplication app(argc, argv);
     QQmlApplicationEngine engine;
     AuthorizationManager authManager;
     Configurator conf;
     QObject::connect(&authManager, &AuthorizationManager::sendConfigRememberUser, &conf, &Configurator::rememberUser);
     auto confInfo = conf.getConfigInfo();
-
+    conf.setAutostartApplication(true);
     const QUrl url(QStringLiteral("qrc:/main.qml"));
     QObject::connect(&engine, &QQmlApplicationEngine::objectCreated,
-                     app, [url, &authManager, &confInfo](QObject *obj, const QUrl &objUrl) {
+                     &app, [url, &authManager, &confInfo](QObject *obj, const QUrl &objUrl) {
         if (!obj && url == objUrl)
             QCoreApplication::exit(-1);
         if(confInfo.rememberUser)
             authManager.quickAuth(confInfo.username, confInfo.passhash);
     }, Qt::QueuedConnection);
     engine.rootContext()->setContextProperty("authManager", &authManager);
-    QObject::connect(app, &QGuiApplication::aboutToQuit, &authManager, &AuthorizationManager::sendDisconnect);
+    QObject::connect(&app, &QGuiApplication::aboutToQuit, &authManager, &AuthorizationManager::sendDisconnect);
 
     engine.load(url);
 
@@ -72,5 +67,5 @@ int main(int argc, char *argv[])
         QObject::connect(windowObj, SIGNAL(qmlSaveCurrentUser()), &authManager, SLOT(saveCurrentUser()));
     }
 
-    return app->exec();
+    return app.exec();
 }
