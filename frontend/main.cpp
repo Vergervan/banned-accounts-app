@@ -5,7 +5,7 @@
 #include <QMetaType>
 #include <QDebug>
 #include <QObject>
-#include <QSystemTrayIcon>
+#include <QQuickWindow>
 #include "authorizationmanager.h"
 #include "configurator.h"
 
@@ -43,10 +43,6 @@ int main(int argc, char *argv[])
     auto confInfo = conf.getConfigInfo();
     conf.setAutostartApplication(true);
 
-    QSystemTrayIcon tray;
-    tray.setIcon(QIcon("appicon.ico"));
-    tray.show();
-
     const QUrl url(QStringLiteral("qrc:/main.qml"));
     QObject::connect(&engine, &QQmlApplicationEngine::objectCreated,
                      &app, [url, &authManager, &confInfo](QObject *obj, const QUrl &objUrl) {
@@ -63,6 +59,14 @@ int main(int argc, char *argv[])
     QObject* windowObj = engine.rootObjects().at(0);
     if(windowObj)
     {
+        QWindow* win = qobject_cast<QWindow*>(windowObj);
+        //Конвертация property компонента в окно
+        QWindow* workspace = qvariant_cast<QWindow*>(win->property("window"));
+        QObject::connect(workspace, &QWindow::windowStateChanged, [workspace](Qt::WindowState state) {
+            if(state == Qt::WindowMinimized){
+                workspace->hide();
+            }
+        });
         QObject::connect(windowObj, SIGNAL(qmlAuth(QString,QString,bool)), &authManager, SLOT(auth(QString,QString,bool)));
         QObject::connect(&authManager, SIGNAL(sendAuthResult(QVariant,QVariant)), windowObj, SLOT(getAuthResult(QVariant,QVariant)));
         QObject::connect(&authManager, SIGNAL(sendAccountData(QVariant,QVariant,QVariant)), windowObj, SLOT(addAccount(QVariant,QVariant,QVariant)));

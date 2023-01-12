@@ -6,10 +6,11 @@ Window {
     id: window
     width: 300
     height: 200
-    title: qsTr("Workspace")
+    title: qsTr("Banned Accounts - Profile")
     property AccountListModel accModel: AccountListModel {}
     property string username: ""
     Component.onCompleted: accModel.clear()
+    onClosing: window.hide()
 
     function addAccount(nick, login, time){
         //accModel.append({"name": nick, "login": login, "days": time})
@@ -32,6 +33,7 @@ Window {
         height: window.height - 10
         antialiasing: true
         columnSpacing: 5
+        rowSpacing: 5
         leftPadding: 5
         rightPadding: 5
         Column{
@@ -89,6 +91,27 @@ Window {
                                 listview.focus = true
                             }
                         }
+                    }
+                }
+            }
+            Row{
+                width: parent.width
+                height: signOutButton.height
+                topPadding: window.height-signOutButton.height-30
+                Button{
+                    id: signOutButton
+                    text: "Sign Out"
+                    background: Rectangle{
+                        implicitWidth: 60
+                        implicitHeight: 25
+                        opacity: enabled ? 1 : 0.3
+                        border.color: plusButton.down ? "#17a81a" : "#21be2b"
+                        border.width: 1
+                        radius: 4
+                    }
+
+                    onClicked: {
+                        root.userExit()
                     }
                 }
             }

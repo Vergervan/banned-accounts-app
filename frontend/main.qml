@@ -23,6 +23,13 @@ Window {
                 window.requestActivate()
             }
         }
+
+        menu: Menu {
+                MenuItem {
+                    text: qsTr("Quit")
+                    onTriggered: Qt.quit()
+                }
+            }
     }
 
     Component.onCompleted: {
@@ -72,7 +79,7 @@ Window {
     width: 340
     height: 320
     visible: true
-    title: qsTr("Authorization in the workspace")
+    title: qsTr("Banned Accounts - Authorization")
 
     Grid{
         id: loginGrid

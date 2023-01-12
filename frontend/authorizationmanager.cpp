@@ -6,6 +6,7 @@
 
 void AuthorizationManager::quickAuth(QString username, QString pass_hash)
 {
+    if(username.isEmpty() || pass_hash.isEmpty()) return;
     _currentUser = username;
     _currentPasshash = pass_hash;
     initSocketConnection();
