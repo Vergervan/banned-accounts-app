@@ -6,11 +6,14 @@
 #include <QDebug>
 #include <QObject>
 #include <QQuickWindow>
+#include <QFileInfo>
+#include <comdef.h>
 #include "authorizationmanager.h"
 #include "configurator.h"
 
 #ifdef Q_OS_WINDOWS
 #include <Windows.h>
+#include <TlHelp32.h>
 #endif
 
 struct AccountInfo : public QObject{
@@ -30,6 +33,8 @@ struct AccountInfo : public QObject{
 };
 Q_DECLARE_METATYPE(AccountInfo)
 
+bool checkProcNumber(std::string procfilename);
+
 int main(int argc, char *argv[])
 {
 #if QT_VERSION < QT_VERSION_CHECK(6, 0, 0)
@@ -37,11 +42,15 @@ int main(int argc, char *argv[])
 #endif
     QGuiApplication app(argc, argv);
     QQmlApplicationEngine engine;
+    if(!checkProcNumber(QFileInfo(QCoreApplication::applicationFilePath()).fileName().toStdString()))
+        return -1;
     AuthorizationManager authManager;
     Configurator conf;
     QObject::connect(&authManager, &AuthorizationManager::sendConfigRememberUser, &conf, &Configurator::rememberUser);
     auto confInfo = conf.getConfigInfo();
+#ifndef QT_DEBUG
     conf.setAutostartApplication(true);
+#endif
 
     const QUrl url(QStringLiteral("qrc:/main.qml"));
     QObject::connect(&engine, &QQmlApplicationEngine::objectCreated,
@@ -77,4 +86,22 @@ int main(int argc, char *argv[])
     }
 
     return app.exec();
+}
+
+bool checkProcNumber(std::string procfilename)
+{
+    HANDLE hsnap = CreateToolhelp32Snapshot(TH32CS_SNAPPROCESS, 0);
+    PROCESSENTRY32 p32;
+    p32.dwSize = sizeof(p32);
+    BOOL hres = Process32First(hsnap, &p32);
+    int cnt = 0;
+    while (hres) {
+        _bstr_t t(p32.szExeFile); //for wchar to char
+        const char* str = t;
+        if(strcmp(str, procfilename.c_str()) == 0) ++cnt;
+        hres = Process32Next(hsnap, &p32);
+    }
+    CloseHandle(hsnap);
+    if(cnt > 1) return false;
+    return true;
 }
