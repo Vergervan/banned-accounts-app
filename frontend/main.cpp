@@ -34,6 +34,11 @@ struct AccountInfo : public QObject{
 Q_DECLARE_METATYPE(AccountInfo)
 
 bool checkProcNumber(std::string procfilename);
+BOOL CALLBACK enum_windows_callback(HWND handle, LPARAM lParam);
+struct handle_data {
+    unsigned long process_id;
+    HWND window_handle;
+};
 
 int main(int argc, char *argv[])
 {
@@ -91,17 +96,40 @@ int main(int argc, char *argv[])
 bool checkProcNumber(std::string procfilename)
 {
     HANDLE hsnap = CreateToolhelp32Snapshot(TH32CS_SNAPPROCESS, 0);
-    PROCESSENTRY32 p32;
+    PROCESSENTRY32 p32, mem_p;
     p32.dwSize = sizeof(p32);
     BOOL hres = Process32First(hsnap, &p32);
     int cnt = 0;
     while (hres) {
         _bstr_t t(p32.szExeFile); //for wchar to char
         const char* str = t;
-        if(strcmp(str, procfilename.c_str()) == 0) ++cnt;
+        if(strcmp(str, procfilename.c_str()) == 0){
+            ++cnt;
+            mem_p = p32;
+        }
         hres = Process32Next(hsnap, &p32);
     }
     CloseHandle(hsnap);
-    if(cnt > 1) return false;
+    if(cnt > 1){
+        handle_data data;
+        data.process_id = mem_p.th32ProcessID;
+        data.window_handle = 0;
+        EnumWindows(enum_windows_callback, (LPARAM)&data);
+        if(data.window_handle != 0)
+            ShowWindow(data.window_handle, SW_MAXIMIZE);
+            //SendMessage(data.window_handle, WM_SYSCOMMAND, SC_MAXIMIZE, 0);
+        return false;
+    }
     return true;
+}
+
+BOOL CALLBACK enum_windows_callback(HWND handle, LPARAM lParam)
+{
+    handle_data& data = *(handle_data*)lParam;
+    unsigned long process_id = 0;
+    GetWindowThreadProcessId(handle, &process_id);
+    if (data.process_id != process_id)
+        return TRUE;
+    data.window_handle = handle;
+    return FALSE;
 }
