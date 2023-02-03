@@ -110,6 +110,8 @@ Configurator::ConfigInfo Configurator::getConfigInfo(){
         }
         auto val = _dict.find("RememberUser");
         info.rememberUser = (val != _dict.end()) && (val->second == "true");
+        val = _dict.find("Autostart");
+        info.autostart = (val != _dict.end()) && (val->second == "true");
         if(info.rememberUser)
         {
             info.username = _dict["Username"], info.passhash = _dict["Passhash"];

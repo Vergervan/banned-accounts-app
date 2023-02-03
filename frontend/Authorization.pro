@@ -1,8 +1,7 @@
 QT += quick \
       sql \
       quickcontrols2 \
-      core \
-      widgets
+      core
 
 CONFIG += \
             c++11 \
@@ -32,6 +31,7 @@ win32:LIBS += -lAdvapi32
 QML_IMPORT_PATH =
 
 RC_ICONS = appicon.ico
+win32:VERSION = 1.0.0.0
 QMAKE_TARGET_DESCRIPTION = Banned Accounts
 QMAKE_TARGET_COMPANY = Vergervan
 # Additional import path used to resolve QML modules just for Qt Quick Designer

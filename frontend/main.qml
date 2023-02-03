@@ -15,12 +15,14 @@ Window {
         icon.source: "qrc:/appicon.ico"
 
         onActivated: {
-            if(window.visible){
-                window.hide()
-            }else{
-                window.show()
-                window.raise()
-                window.requestActivate()
+            if(!root.visible){
+                if(window.visible){
+                    window.hide()
+                }else{
+                    window.show()
+                    window.raise()
+                    window.requestActivate()
+                }
             }
         }
 

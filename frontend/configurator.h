@@ -18,6 +18,7 @@ class Configurator : public QObject
     public:
         struct ConfigInfo{
             bool newConfig = false;
+            bool autostart = false;
             bool rememberUser = false;
             QString username, passhash;
         };

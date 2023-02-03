@@ -33,7 +33,7 @@ struct AccountInfo : public QObject{
 };
 Q_DECLARE_METATYPE(AccountInfo)
 
-bool checkProcNumber(std::string procfilename);
+bool checkProcNumber(std::string procfilename, qint64);
 BOOL CALLBACK enum_windows_callback(HWND handle, LPARAM lParam);
 struct handle_data {
     unsigned long process_id;
@@ -47,7 +47,7 @@ int main(int argc, char *argv[])
 #endif
     QGuiApplication app(argc, argv);
     QQmlApplicationEngine engine;
-    if(!checkProcNumber(QFileInfo(QCoreApplication::applicationFilePath()).fileName().toStdString()))
+    if(!checkProcNumber(QFileInfo(QCoreApplication::applicationFilePath()).fileName().toStdString(), app.applicationPid()))
         return -1;
     AuthorizationManager authManager;
     Configurator conf;
@@ -93,7 +93,7 @@ int main(int argc, char *argv[])
     return app.exec();
 }
 
-bool checkProcNumber(std::string procfilename)
+bool checkProcNumber(std::string procfilename, qint64 pid)
 {
     HANDLE hsnap = CreateToolhelp32Snapshot(TH32CS_SNAPPROCESS, 0);
     PROCESSENTRY32 p32, mem_p;
@@ -105,7 +105,8 @@ bool checkProcNumber(std::string procfilename)
         const char* str = t;
         if(strcmp(str, procfilename.c_str()) == 0){
             ++cnt;
-            mem_p = p32;
+            if(p32.th32ProcessID != pid)
+                mem_p = p32;
         }
         hres = Process32Next(hsnap, &p32);
     }
@@ -116,7 +117,8 @@ bool checkProcNumber(std::string procfilename)
         data.window_handle = 0;
         EnumWindows(enum_windows_callback, (LPARAM)&data);
         if(data.window_handle != 0)
-            ShowWindow(data.window_handle, SW_MAXIMIZE);
+            SetForegroundWindow(data.window_handle);
+            //ShowWindow(data.window_handle, SW_);
             //SendMessage(data.window_handle, WM_SYSCOMMAND, SC_MAXIMIZE, 0);
         return false;
     }
