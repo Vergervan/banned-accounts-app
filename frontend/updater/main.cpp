@@ -8,7 +8,7 @@ int main(int argc, char *argv[])
     QApplication a(argc, argv);
     Widget w;
     QPalette pal;
-    pal.setColor(QPalette::Window, QColor("#545454"));
+    pal.setColor(QPalette::Window, QColor(54, 54, 54));
     w.setAutoFillBackground(true);
     w.setPalette(pal);
     w.show();

@@ -139,7 +139,6 @@
     <font>
      <family>Berlin Sans FB Demi</family>
      <pointsize>12</pointsize>
-     <weight>75</weight>
      <bold>true</bold>
     </font>
    </property>
@@ -158,7 +157,7 @@ Updater
      <x>30</x>
      <y>120</y>
      <width>241</width>
-     <height>24</height>
+     <height>16</height>
     </rect>
    </property>
    <property name="palette">
